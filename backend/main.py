@@ -362,17 +362,32 @@ def get_memory_alerts():
     return {"alerts": detect_proactive_alerts()}
 
 # --- UNIFIED FRONTEND STATIC FILES MOUNTING FOR ALL-IN-ONE RENDER DEPLOYMENT ---
-FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
-if os.path.exists(FRONTEND_DIST):
+candidate_paths = [
+    os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"),
+    os.path.join(os.getcwd(), "..", "frontend", "dist"),
+    os.path.join(os.getcwd(), "frontend", "dist"),
+    "/opt/render/project/src/frontend/dist"
+]
+
+FRONTEND_DIST = None
+for p in candidate_paths:
+    if os.path.exists(p) and os.path.isdir(p):
+        FRONTEND_DIST = os.path.abspath(p)
+        break
+
+if FRONTEND_DIST:
     assets_dir = os.path.join(FRONTEND_DIST, "assets")
     if os.path.exists(assets_dir):
         app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
     @app.get("/{full_path:path}")
-    def serve_frontend_spa(full_path: str):
-        if full_path.startswith("api"):
+    def serve_frontend_spa(full_path: str = ""):
+        if full_path.startswith("api/"):
             raise HTTPException(status_code=404, detail="API route not found")
         file_path = os.path.join(FRONTEND_DIST, full_path)
-        if os.path.exists(file_path) and os.path.isfile(file_path):
+        if full_path and os.path.exists(file_path) and os.path.isfile(file_path):
             return FileResponse(file_path)
-        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
+        index_file = os.path.join(FRONTEND_DIST, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Frontend index.html not found")
