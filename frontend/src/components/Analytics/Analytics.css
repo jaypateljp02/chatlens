@@ -1,0 +1,121 @@
+.analytics-dashboard {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.analytics-header {
+  margin-bottom: 24px;
+}
+
+.analytics-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.analytics-card {
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.analytics-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.analytics-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.chart-container {
+  width: 100%;
+  position: relative;
+}
+
+.word-cloud-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+}
+
+.word-pill {
+  border-radius: 20px;
+  font-weight: 500;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  cursor: default;
+}
+
+.word-pill:hover {
+  transform: scale(1.1);
+}
+
+.starters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.starter-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.starter-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 80px;
+}
+
+.starter-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.starter-count {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.starter-bar-container {
+  flex: 1;
+  height: 8px;
+  background-color: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.starter-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease-out;
+}
+
+.starter-percentage {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  min-width: 40px;
+  text-align: right;
+}

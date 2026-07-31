@@ -1,0 +1,52 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  max-height: 100vh;
+  background-color: var(--bg-main);
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.content-wrapper {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  height: calc(100vh - 70px);
+  -webkit-overflow-scrolling: touch;
+}
+
+.content-wrapper::-webkit-scrollbar {
+  width: 6px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(18, 140, 126, 0.25);
+  border-radius: 4px;
+}
+
+.content-wrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+.content-wrapper > * {
+  animation: fadeIn var(--transition-normal);
+}
+
+/* MEDIA QUERIES FOR MOBILE SCREEN RESPONSIVENESS */
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 0.85rem;
+    padding-bottom: 80px !important; /* Prevent bottom bar overlap */
+    height: auto;
+  }
+}

@@ -1,0 +1,236 @@
+.upload-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+}
+
+.upload-card {
+  padding: 2.5rem;
+  margin-bottom: 3.5rem;
+  background: var(--bg-white);
+}
+
+.dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background-color: #FAFAFA;
+}
+
+.dropzone:hover, .dropzone.active {
+  border-color: var(--primary);
+  background-color: rgba(37, 211, 102, 0.05);
+}
+
+.dropzone.active {
+  transform: scale(1.02);
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.upload-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  background-color: var(--bg-main);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  transition: all var(--transition-normal);
+}
+
+.dropzone:hover .upload-icon-wrapper {
+  background-color: rgba(37, 211, 102, 0.1);
+}
+
+.upload-icon {
+  color: var(--primary);
+}
+
+.dropzone h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.file-info {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.divider {
+  width: 100%;
+  max-width: 250px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.divider span {
+  padding: 0 10px;
+}
+
+.upload-progress-container {
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+.file-success-icon {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.file-success-icon .pulse {
+  color: var(--accent-blue);
+  animation: pulse 1.5s infinite;
+}
+
+.file-success-icon .success {
+  color: var(--primary);
+}
+
+.filename {
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 1.5rem 0;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  max-width: 400px;
+  height: 8px;
+  background-color: var(--bg-main);
+  border-radius: 4px;
+  margin: 0 auto 0.5rem auto;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.guide-section {
+  margin-top: 2rem;
+}
+
+.guide-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+}
+
+.wizard-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.wizard-card {
+  padding: 2rem 1.5rem;
+  position: relative;
+  text-align: center;
+  overflow: hidden;
+}
+
+.wizard-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--primary);
+  opacity: 0.5;
+  transition: opacity var(--transition-normal);
+}
+
+.wizard-card:hover::before {
+  opacity: 1;
+}
+
+.step-number {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  background-color: var(--bg-main);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.step-icon {
+  width: 64px;
+  height: 64px;
+  background-color: rgba(37, 211, 102, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem auto;
+  color: var(--primary-dark);
+}
+
+.wizard-card h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.wizard-card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}

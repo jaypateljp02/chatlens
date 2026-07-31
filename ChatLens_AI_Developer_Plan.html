@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatLens AI — Developer Technical Architecture & Build Plan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #128C7E;
+            --primary-dark: #075E54;
+            --primary-light: #25D366;
+            --bg-main: #FFFFFF;
+            --bg-code: #1E1E1E;
+            --bg-section: #F8FAF9;
+            --text-primary: #111B21;
+            --text-secondary: #54656F;
+            --border: #E9EDEF;
+            --accent-blue: #0288D1;
+            --accent-purple: #7B1FA2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-main);
+            line-height: 1.6;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        @media print {
+            body { font-size: 11px; }
+            .page-break { page-break-before: always; }
+            .no-print { display: none; }
+            .cover { min-height: 100vh; }
+        }
+
+        .cover {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 60px 40px;
+        }
+
+        .cover-badge {
+            background: rgba(255,255,255,0.15);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 30px;
+        }
+
+        .cover h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .cover p {
+            font-size: 18px;
+            opacity: 0.9;
+            max-width: 650px;
+            margin-bottom: 40px;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px 40px;
+        }
+
+        h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin: 36px 0 16px;
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 24px 0 12px;
+        }
+
+        p, li {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background: #F0F2F5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #D32F2F;
+        }
+
+        pre {
+            background: var(--bg-code);
+            color: #D4D4D4;
+            font-family: 'Fira Code', monospace;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+            margin: 16px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+
+        table thead {
+            background: var(--primary-dark);
+            color: white;
+        }
+
+        table th, table td {
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            text-align: left;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: var(--bg-section);
+        }
+
+        .tech-box {
+            background: var(--bg-section);
+            border-left: 4px solid var(--primary);
+            padding: 20px;
+            border-radius: 0 12px 12px 0;
+            margin: 20px 0;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn no-print" onclick="window.print()">📄 Save Developer Plan PDF</button>
+
+    <!-- COVER -->
+    <div class="cover">
+        <div class="cover-badge">Developer Technical Plan</div>
+        <h1>ChatLens AI Blueprint</h1>
+        <p>Comprehensive System Architecture, Code Specifications, Database Schemas, RAG Pipelines, and Windows Server Deployment Guide.</p>
+    </div>
+
+    <div class="content">
+        <!-- 1. TECH STACK ARCHITECTURE -->
+        <h2>1. System Architecture &amp; Tech Stack</h2>
+        <p>ChatLens AI is engineered as a decoupled single-page application (SPA) with a high-performance Python FastAPI backend, backed by PostgreSQL with vector capabilities and dual AI integrations.</p>
+
+        <table>
+            <thead>
+                <tr><th>Component</th><th>Technology</th><th>Implementation Detail</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Frontend SPA</strong></td>
+                    <td>React 18 + Vite</td>
+                    <td>Vanilla CSS design system, Recharts for analytics, React Force Graph for Knowledge Graph visualization.</td>
+                </tr>
+                <tr>
+                    <td><strong>Backend Framework</strong></td>
+                    <td>FastAPI + Uvicorn</td>
+                    <td>Asynchronous API handling, Pydantic validation, CORS enabled.</td>
+                </tr>
+                <tr>
+                    <td><strong>Database</strong></td>
+                    <td>PostgreSQL + <code>pgvector</code></td>
+                    <td>Single unified database for relational metadata (users, entities, chats) and vector embeddings.</td>
+                </tr>
+                <tr>
+                    <td><strong>RAG Retrieval Layer</strong></td>
+                    <td>LlamaIndex</td>
+                    <td>Handles document ingestion, hierarchical chunking, auto-merging retrieval, and embedding generation.</td>
+                </tr>
+                <tr>
+                    <td><strong>RAG Orchestration</strong></td>
+                    <td>LangGraph</td>
+                    <td>Manages stateful multi-turn agent execution, tool routing, and cross-chat memory retrieval.</td>
+                </tr>
+                <tr>
+                    <td><strong>AI Models</strong></td>
+                    <td>Gemini 1.5 Pro + GPT-4o</td>
+                    <td>Gemini for long-context (1M window) summarization; GPT-4o for natural Q&amp;A and narrative generation.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 2. DATABASE SCHEMAS -->
+        <h2>2. Production Database Schema (PostgreSQL + pgvector)</h2>
+        <p>The system utilizes a single PostgreSQL instance for both structured entity relational tables and <code>pgvector</code> vector search.</p>
+
+        <pre><code>-- Enable pgvector extension
+CREATE EXTENSION IF NOT EXISTS vector;
+
+-- Chats Table
+CREATE TABLE chats (
+    chat_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    filename VARCHAR(255) NOT NULL,
+    group_name VARCHAR(255),
+    total_messages INT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Messages Table
+CREATE TABLE messages (
+    message_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    chat_id UUID REFERENCES chats(chat_id) ON DELETE CASCADE,
+    sender VARCHAR(255),
+    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+    content TEXT NOT NULL,
+    message_type VARCHAR(50) DEFAULT 'text',
+    is_system BOOLEAN DEFAULT FALSE,
+    message_hash VARCHAR(64) UNIQUE NOT NULL
+);
+
+-- Vector Embeddings Table (pgvector)
+CREATE TABLE message_embeddings (
+    embedding_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    message_id UUID REFERENCES messages(message_id) ON DELETE CASCADE,
+    chat_id UUID REFERENCES chats(chat_id) ON DELETE CASCADE,
+    embedding vector(768), -- Gemini text-embedding-004 dimension
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX ON message_embeddings USING hnsw (embedding vector_cosine_ops);</code></pre>
+
+        <!-- 3. PARSER SPECIFICATION -->
+        <h2>3. WhatsApp Parsing &amp; Deduplication Engine</h2>
+        <p>The parser handles standard and non-standard WhatsApp exports across 4 timestamp patterns, multi-line strings, and Indian scripts (Unicode UTF-8).</p>
+
+        <h3>Regex Pattern Matcher</h3>
+        <pre><code># Python Regex matching 4 timestamp formats:
+# 1. [DD/MM/YYYY, HH:MM:SS] Sender: Content
+# 2. DD/MM/YYYY, HH:MM - Sender: Content
+# 3. MM/DD/YY, HH:MM AM/PM - Sender: Content
+# 4. [DD/MM/YY, HH:MM:SS] Sender: Content
+
+date_time_pattern = re.compile(
+    r'^(?:\[(\d{1,2}[\./-]\d{1,2}[\./-]\d{2,4}), (\d{1,2}:\d{2}(?::\d{2})?(?: ?[APMampm]{2})?)\] |'
+    r'(\d{1,2}[\./-]\d{1,2}[\./-]\d{2,4}), (\d{1,2}:\d{2}(?::\d{2})?(?: ?[APMampm]{2})?) - )(.*)'
+)</code></pre>
+
+        <h3>Deduplication &amp; Overlap Logic</h3>
+        <div class="tech-box">
+            <p><strong>Hash Strategy:</strong> Every message gets a SHA-256 hash computed from <code>timestamp + sender + content</code>.</p>
+            <p>During 500-message chunking with 50-message overlaps, identical messages match the <code>message_hash</code> constraint in PostgreSQL and are ignored. <strong>Zero message loss and zero duplicates guaranteed.</strong></p>
+        </div>
+
+        <!-- 4. RAG & MEMORY PIPELINE -->
+        <h2>4. LlamaIndex + LangGraph RAG System</h2>
+        <p>The RAG pipeline provides continuous memory learning across chats.</p>
+
+        <pre><code># RAG Pipeline Flow:
+# 1. Ingestion: LlamaIndex reads messages -> splits into chunks -> generates Gemini Embeddings
+# 2. Storage: Vectors stored in pgvector table
+# 3. Retrieval: Query triggers LlamaIndex AutoMergingRetriever to fetch relevant context
+# 4. Orchestration: LangGraph agent passes context to GPT-4o / Gemini for structured response
+
+from llama_index.core import VectorStoreIndex
+from llama_index.vector_stores.postgres import PGVectorStore
+
+vector_store = PGVectorStore.from_params(
+    database="chatlens",
+    host="localhost",
+    password="password",
+    port=5432,
+    user="postgres",
+    table_name="message_embeddings",
+    embed_dim=768
+)</code></pre>
+
+        <!-- 5. WINDOWS SERVER DEPLOYMENT -->
+        <h2>5. Windows Server Production Deployment</h2>
+        <p>ChatLens AI is configured for native deployment on Windows Server using IIS / Nginx and NSSM (Non-Sucking Service Manager).</p>
+
+        <ol>
+            <li><strong>PostgreSQL Setup:</strong> Install PostgreSQL 16 on Windows Server, enable <code>pgvector</code> extension.</li>
+            <li><strong>Backend Process Management:</strong> Register Uvicorn server as a Windows Service using <code>nssm</code>:
+                <pre><code>nssm install ChatLensBackend "C:\Python311\Scripts\uvicorn.exe" "main:app --host 127.0.0.1 --port 8000 --workers 4"</code></pre>
+            </li>
+            <li><strong>Frontend Production Build:</strong> Run <code>npm run build</code> to produce static assets in <code>/dist</code>, served via IIS or Nginx.</li>
+            <li><strong>Reverse Proxy:</strong> Configure Nginx/IIS to proxy <code>/api/*</code> to <code>http://127.0.0.1:8000</code>.</li>
+        </ol>
+    </div>
+
+    <div class="footer" style="background: var(--primary-dark); color: white; text-align: center; padding: 30px; margin-top: 50px;">
+        <p>ChatLens AI — Developer Technical Blueprint — July 2026</p>
+    </div>
+
+</body>
+</html>

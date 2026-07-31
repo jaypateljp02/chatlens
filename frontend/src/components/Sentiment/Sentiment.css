@@ -1,0 +1,90 @@
+.sentiment-dashboard {
+  padding: 24px;
+}
+
+.sentiment-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.stress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stress-item {
+  background: var(--bg-main);
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.person-name {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.alert-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.alert-badge.high {
+  background: rgba(239, 83, 80, 0.15);
+  color: #EF5350;
+}
+
+.alert-badge.medium {
+  background: rgba(255, 167, 38, 0.15);
+  color: #FFA726;
+}
+
+.alert-badge.low {
+  background: rgba(37, 211, 102, 0.15);
+  color: #25D366;
+}
+
+.phrase-tag {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.conflict-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.timeline-event {
+  border-left: 3px solid #EF5350;
+  padding-left: 12px;
+  background: var(--bg-main);
+  padding: 12px 16px;
+  border-radius: 0 8px 8px 0;
+}
+
+.timeline-date {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.timeline-content {
+  font-size: 13px;
+}

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatLens AI — Client Project Proposal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #25D366;
+            --primary-dark: #128C7E;
+            --primary-darker: #075E54;
+            --bg-main: #FFFFFF;
+            --bg-section: #F8FAF9;
+            --bg-accent: #E8F5E9;
+            --text-primary: #111B21;
+            --text-secondary: #667781;
+            --accent-blue: #0091EA;
+            --accent-orange: #FF6D00;
+            --accent-purple: #7C4DFF;
+            --accent-red: #EF5350;
+            --border: #E0E6E4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-primary);
+            background: var(--bg-main);
+            line-height: 1.7;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        @media print {
+            body { font-size: 11px; }
+            .page-break { page-break-before: always; }
+            .no-print { display: none; }
+            .cover { min-height: 100vh; }
+        }
+
+        /* Cover Page */
+        .cover {
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-darker) 0%, var(--primary-dark) 40%, var(--primary) 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 60px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-badge {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+        }
+
+        .cover-logo {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .cover h1 {
+            font-size: 56px;
+            font-weight: 900;
+            letter-spacing: -2px;
+            margin-bottom: 16px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .cover h1 span {
+            background: linear-gradient(90deg, #FFFFFF, #B2FF59);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover .subtitle {
+            font-size: 22px;
+            font-weight: 300;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-bottom: 50px;
+        }
+
+        .cover-meta {
+            display: flex;
+            gap: 40px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .cover-meta div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .cover-meta .label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.7;
+        }
+
+        /* Content Sections */
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-darker);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        h2 .emoji {
+            margin-right: 12px;
+        }
+
+        .section-subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 36px;
+            font-weight: 400;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin: 32px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--bg-accent);
+        }
+
+        p {
+            font-size: 15px;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        /* Section Divider */
+        .section-divider {
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark), var(--primary-darker));
+            border-radius: 2px;
+            margin: 60px 0;
+        }
+
+        /* Feature Cards Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 24px 0;
+        }
+
+        .feature-card {
+            background: var(--bg-section);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+        }
+
+        .feature-card .card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0;
+        }
+
+        .feature-card ul li {
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 4px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-card ul li::before {
+            content: '\2713';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .feature-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 32px 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-darker), var(--primary-dark));
+            color: white;
+            padding: 28px 16px;
+            border-radius: 16px;
+        }
+
+        .stat-box .number {
+            font-size: 36px;
+            font-weight: 900;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .stat-box .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.85;
+        }
+
+        /* Architecture Box */
+        .arch-box {
+            background: var(--bg-section);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            margin: 24px 0;
+        }
+
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .arch-node {
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 12px;
+            padding: 16px 20px;
+            text-align: center;
+            min-width: 130px;
+            flex: 1;
+        }
+
+        .arch-node .node-icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .arch-node .node-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--primary-darker);
+        }
+
+        .arch-node .node-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .arch-arrow {
+            font-size: 24px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+
+        table thead {
+            background: var(--primary-darker);
+            color: white;
+        }
+
+        table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+
+        table th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        table th:last-child {
+            border-radius: 0 12px 0 0;
+        }
+
+        table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        table tbody tr:nth-child(even) {
+            background: var(--bg-section);
+        }
+
+        /* Callout Box */
+        .callout {
+            border-left: 4px solid var(--primary);
+            background: var(--bg-accent);
+            padding: 20px 24px;
+            border-radius: 0 12px 12px 0;
+            margin: 24px 0;
+        }
+
+        .callout.info {
+            border-left-color: var(--accent-blue);
+            background: #E3F2FD;
+        }
+
+        .callout h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .callout p {
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* USP Banner */
+        .usp-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .usp-item {
+            text-align: center;
+            padding: 20px 14px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+        }
+
+        .usp-item .usp-icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .usp-item h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--primary-darker);
+        }
+
+        .usp-item p {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        /* Language badges */
+        .lang-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .lang-badge {
+            background: var(--bg-accent);
+            border: 1px solid var(--primary);
+            color: var(--primary-darker);
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--primary-darker);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .footer h3 {
+            color: white;
+            border: none;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .footer p {
+            color: rgba(255,255,255,0.8);
+            font-size: 14px;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(37,211,102,0.4);
+            z-index: 1000;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .print-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn no-print" onclick="window.print()">&#128196; Save Client Proposal PDF</button>
+
+    <!-- COVER PAGE -->
+    <div class="cover">
+        <div class="cover-badge">Client Project Proposal</div>
+        <div class="cover-logo">&#129504;&#128172;</div>
+        <h1><span>ChatLens AI</span></h1>
+        <p class="subtitle">Transforming WhatsApp conversations into powerful, AI-driven intelligence — summaries, analytics, sentiment maps, and organizational memory.</p>
+        <div class="cover-meta">
+            <div>
+                <span class="label">Prepared For</span>
+                <span>Executive &amp; Client Team</span>
+            </div>
+            <div>
+                <span class="label">Date</span>
+                <span>July 2026</span>
+            </div>
+            <div>
+                <span class="label">Solution Type</span>
+                <span>Enterprise AI Platform</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+        <h2><span class="emoji">&#128204;</span>Executive Summary</h2>
+        <p class="section-subtitle">Turn unstructured chat history into actionable business value</p>
+
+        <p><strong>ChatLens AI</strong> is an advanced AI intelligence platform designed to convert raw WhatsApp chat exports into rich, interactive, visual insights. Powered by cutting-edge dual AI models (Google Gemini &amp; OpenAI GPT), ChatLens AI provides continuous learning, cross-chat memory, and deep communication analytics.</p>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <span class="number">10+</span>
+                <span class="label">Feature Modules</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">8+</span>
+                <span class="label">Indian Languages</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">100%</span>
+                <span class="label">Data Privacy</span>
+            </div>
+            <div class="stat-box">
+                <span class="number">0</span>
+                <span class="label">Messages Lost</span>
+            </div>
+        </div>
+
+        <div class="usp-grid">
+            <div class="usp-item">
+                <span class="usp-icon">&#127919;</span>
+                <h4>Domain Insights</h4>
+                <p>Health patterns, training success, project milestones auto-extracted.</p>
+            </div>
+            <div class="usp-item">
+                <span class="usp-icon">&#128274;</span>
+                <h4>Privacy First</h4>
+                <p>Hosted on your Windows Server. Complete control &amp; data ownership.</p>
+            </div>
+            <div class="usp-item">
+                <span class="usp-icon">&#127760;</span>
+                <h4>Multi-Language</h4>
+                <p>Hindi, Marathi, Gujarati, English, Hinglish handled seamlessly.</p>
+            </div>
+            <div class="usp-item">
+                <span class="usp-icon">&#129296;</span>
+                <h4>Learning Memory</h4>
+                <p>Gets smarter with every chat. Cross-chat intelligence &amp; Q&amp;A.</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 10 FEATURE MODULES -->
+        <h2><span class="emoji">&#127919;</span>10 Feature Modules</h2>
+        <p class="section-subtitle">Complete intelligence suite covering every aspect of communication</p>
+
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="card-icon">&#128203;</div>
+                <h4>1. Smart Summaries</h4>
+                <ul>
+                    <li>Bullet point summary (major &amp; minor tasks)</li>
+                    <li>Story mode (relationship &amp; interaction narrative)</li>
+                    <li>Project timeline (chronological progress)</li>
+                    <li>Pending items &amp; ideas</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">&#128202;</div>
+                <h4>2. Communication Analytics</h4>
+                <ul>
+                    <li>Peak chatting hours heatmap</li>
+                    <li>Most active day of the week</li>
+                    <li>Conversation starters &amp; response time</li>
+                    <li>Per-person message volume &amp; word cloud</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">&#128173;</div>
+                <h4>3. Sentiment &amp; Emotional Analytics</h4>
+                <ul>
+                    <li>Mood trends over weeks &amp; months</li>
+                    <li>Stress language detection</li>
+                    <li>Conflict &amp; disagreement timeline</li>
+                    <li>Gratitude &amp; energy trends</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">&#128101;</div>
+                <h4>4. People Profiles</h4>
+                <ul>
+                    <li>Individual profile cards</li>
+                    <li>Who talks to whom most</li>
+                    <li>Engagement &amp; participation score</li>
+                    <li>Communication style analysis</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">&#127991;&#65039;</div>
+                <h4>5. Topic Extraction</h4>
+                <ul>
+                    <li>Auto-detect discussion topics</li>
+                    <li>Topic evolution timeline</li>
+                    <li>Domain insights (health, training, ops)</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">&#128197;</div>
+                <h4>6. Timeline &amp; Period Comparison</h4>
+                <ul>
+                    <li>Key milestones timeline</li>
+                    <li>Compare Jan vs June progress</li>
+                    <li>Before &amp; after report cards</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">&#9888;&#65039;</div>
+                <h4>7. Action Items Tracker</h4>
+                <ul>
+                    <li>AI detects promises &amp; assignments</li>
+                    <li>Tracks if follow-up was completed</li>
+                    <li>Unresolved tasks dashboard</li>
+                </ul>
+            </div>
+            <div class="feature-card">
+                <div class="card-icon">&#128241;</div>
+                <h4>8. Export &amp; Reports</h4>
+                <ul>
+                    <li>One-click PDF executive report</li>
+                    <li>PNG export for charts</li>
+                    <li>Shareable summary views</li>
+                </ul>
+            </div>
+            <div class="feature-card full-width">
+                <div class="card-icon">&#127381;</div>
+                <h4>9. Advanced Intelligence</h4>
+                <ul>
+                    <li>Deleted messages pattern detection</li>
+                    <li>Call &amp; voice note frequency tracking</li>
+                    <li>Group admin action logs</li>
+                    <li>Custom keyword monitoring</li>
+                </ul>
+            </div>
+            <div class="feature-card full-width" style="border: 2px solid var(--primary);">
+                <div class="card-icon">&#129296;</div>
+                <h4>10. AI Memory &amp; RAG System (Learning Engine)</h4>
+                <ul>
+                    <li><strong>Persistent Knowledge Base:</strong> Learns and remembers across all uploaded chats over time.</li>
+                    <li><strong>Cross-Chat Q&amp;A:</strong> Ask questions spanning multiple groups (e.g., "What were all open tasks across projects?").</li>
+                    <li><strong>Per-Person Intelligence:</strong> Track an individual's total impact, sentiment, and style across all groups.</li>
+                    <li><strong>Proactive Smart Alerts:</strong> Automatic alerts when stress language spikes or projects stall.</li>
+                    <li><strong>Interactive Knowledge Graph:</strong> Drag, zoom, and explore connections between people, topics, and teams.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- DOMAIN USE CASES -->
+        <h2><span class="emoji">&#127970;</span>Domain Use Cases</h2>
+        <p class="section-subtitle">Tailored insights for specific group types</p>
+
+        <table>
+            <thead>
+                <tr><th>Use Case</th><th>What ChatLens AI Delivers</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>🏥 Health Groups (e.g. Taare)</strong></td>
+                    <td>Tracks health issues mentioned, treatment proposed, and exact resolution time per child.</td>
+                </tr>
+                <tr>
+                    <td><strong>📚 Training Groups</strong></td>
+                    <td>Summarizes successful training programs conducted and identifies unexplored ideas for future execution.</td>
+                </tr>
+                <tr>
+                    <td><strong>🏗️ Project Groups</strong></td>
+                    <td>Tracks project progress chronologically, flags bottlenecks, and lists pending assignments.</td>
+                </tr>
+                <tr>
+                    <td><strong>🏢 Corporate / Team Chat</strong></td>
+                    <td>Identifies top conversation starters, department stress trends, and peak activity hours.</td>
+                </tr>
+                <tr>
+                    <td><strong>👤 Per-Person Intelligence</strong></td>
+                    <td>Analyzes any individual across all groups they participate in to track sentiment, impact, and communication balance.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- COMPETITIVE ADVANTAGE -->
+        <h2><span class="emoji">&#127942;</span>Why ChatLens AI Leads</h2>
+        <p class="section-subtitle">Comparison against basic chat analytics tools</p>
+
+        <table>
+            <thead>
+                <tr><th>Capability</th><th>Basic Analytics Apps</th><th>ChatLens AI</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Summaries</td><td>❌ Basic word counts</td><td>✅ Multi-mode AI summaries &amp; Q&amp;A</td></tr>
+                <tr><td>AI Memory</td><td>❌ No memory</td><td>✅ Continuous learning &amp; Cross-Chat RAG</td></tr>
+                <tr><td>Indian Languages</td><td>⚠️ English only</td><td>✅ Hindi, Marathi, Gujarati, Hinglish</td></tr>
+                <tr><td>Sentiment Analysis</td><td>⚠️ Superficial</td><td>✅ Stress language, conflict, gratitude</td></tr>
+                <tr><td>Action Tracking</td><td>❌ None</td><td>✅ AI promise detection &amp; follow-up</td></tr>
+                <tr><td>Data Privacy</td><td>⚠️ Cloud vendors</td><td>✅ Self-hosted on Windows Server</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <h3>ChatLens AI</h3>
+        <p>Transforming Conversations into Organizational Intelligence.</p>
+        <p style="margin-top: 16px; font-size: 12px; opacity: 0.6;">Client Project Proposal — July 2026</p>
+    </div>
+
+</body>
+</html>
