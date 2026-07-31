@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
-import { UploadCloud, CheckCircle, FileText, MoreVertical, Share, Smartphone, Sparkles } from 'lucide-react';
+import { UploadCloud, CheckCircle, FileText, MoreVertical, Share, Smartphone, Sparkles, AlertCircle } from 'lucide-react';
 import { uploadChat, loadDemoChatSession } from '../../utils/api';
 import './ChatUpload.css';
 
@@ -9,6 +9,7 @@ export default function ChatUpload() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
   const onDrop = useCallback(acceptedFiles => {
@@ -22,47 +23,48 @@ export default function ChatUpload() {
     accept: {
       'text/plain': ['.txt']
     },
-    maxSize: 50 * 1024 * 1024, // 50MB
+    maxSize: 50 * 1024 * 1024,
     multiple: false
   });
 
   const handleUpload = async (selectedFile) => {
     setFile(selectedFile);
     setUploading(true);
+    setErrorMessage(null);
+    setProgress(30);
     
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 10;
-      setProgress(currentProgress);
-      
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-        setTimeout(() => {
-          setUploading(false);
-          navigate('/dashboard');
-        }, 600);
-      }
-    }, 80);
-
     try {
-      await uploadChat(selectedFile);
+      setProgress(60);
+      const result = await uploadChat(selectedFile);
+      setProgress(100);
+      
+      setTimeout(() => {
+        setUploading(false);
+        // Force reload so header dropdown & all components update to the newly uploaded chat
+        window.location.href = '/dashboard';
+      }, 500);
     } catch (e) {
-      console.warn('Upload error:', e);
+      console.error('Upload error:', e);
+      setErrorMessage(e.message || 'Upload failed. Please ensure the file is a valid WhatsApp .txt export.');
+      setUploading(false);
+      setProgress(0);
     }
   };
 
   const handleLoadSample = async () => {
     setUploading(true);
+    setErrorMessage(null);
     setProgress(50);
     try {
       await loadDemoChatSession();
       setProgress(100);
       setTimeout(() => {
         setUploading(false);
-        navigate('/dashboard');
+        window.location.href = '/dashboard';
       }, 500);
     } catch (e) {
       console.error(e);
+      setErrorMessage('Failed to load sample session.');
       setUploading(false);
     }
   };
@@ -73,6 +75,13 @@ export default function ChatUpload() {
         <h1 className="hero-title">Upload Your WhatsApp Chat</h1>
         <p className="hero-subtitle">Get AI-powered insights, sentiment analysis, and summaries instantly.</p>
       </div>
+
+      {errorMessage && (
+        <div style={{ background: '#EF535020', border: '1px solid #EF5350', padding: '12px 16px', borderRadius: '12px', color: '#C62828', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <AlertCircle size={20} />
+          <span>{errorMessage}</span>
+        </div>
+      )}
 
       <div className="upload-card card" id="dropzone-card">
         {!file && !uploading ? (
@@ -110,7 +119,7 @@ export default function ChatUpload() {
             <div className="file-success-icon">
               {progress < 100 ? <FileText size={40} className="pulse" /> : <CheckCircle size={40} className="success" />}
             </div>
-            <h3>{progress < 100 ? 'Analyzing Chat...' : 'Upload Complete!'}</h3>
+            <h3>{progress < 100 ? 'Analyzing Chat with AI...' : 'Upload Complete!'}</h3>
             <p className="filename">{file?.name || 'Sample_Project_Chat_Export.txt'}</p>
             <div className="progress-bar-bg">
               <div 
