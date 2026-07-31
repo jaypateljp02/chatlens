@@ -1,4 +1,6 @@
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+  ? 'http://localhost:8000/api'
+  : '/api';
 
 // Initialize default activeChatId synchronously so all components receive 'all' instantly on initial load
 if (!localStorage.getItem('activeChatId')) {
