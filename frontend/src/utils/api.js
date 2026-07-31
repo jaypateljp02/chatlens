@@ -1,16 +1,46 @@
-const API_BASE = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
-  ? 'http://localhost:8000/api'
-  : '/api';
+// Universal Resilient API Base Selector
+const getApiBaseUrl = () => {
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
+    return import.meta.env.VITE_API_BASE.replace(/\/$/, '') + '/api';
+  }
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return 'http://localhost:8000/api';
+    }
+  }
+  return '/api';
+};
 
-// Initialize default activeChatId synchronously so all components receive 'all' instantly on initial load
+const API_BASE = getApiBaseUrl();
+
+// Synchronous default initialization for activeChatId
 if (!localStorage.getItem('activeChatId')) {
   localStorage.setItem('activeChatId', 'all');
   localStorage.setItem('chatMetadata', JSON.stringify({ filename: 'All Chats (Master Memory)', total_messages: 'All Combined' }));
 }
 
+async function apiFetch(endpoint, options = {}) {
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, options);
+    if (res.ok) return res;
+    // Fallback attempt for local port 8000 if relative /api returned 404
+    if (API_BASE !== 'http://localhost:8000/api') {
+      const fallbackRes = await fetch(`http://localhost:8000/api${endpoint}`, options);
+      if (fallbackRes.ok) return fallbackRes;
+    }
+    return res;
+  } catch (e) {
+    if (API_BASE !== 'http://localhost:8000/api') {
+      return await fetch(`http://localhost:8000/api${endpoint}`, options);
+    }
+    throw e;
+  }
+}
+
 export async function getSavedChats() {
   try {
-    const res = await fetch(`${API_BASE}/chats`);
+    const res = await apiFetch('/chats');
     if (!res.ok) return [];
     const data = await res.json();
     return data.sessions || [];
@@ -21,9 +51,7 @@ export async function getSavedChats() {
 
 export async function deleteSavedChat(chatId) {
   try {
-    const res = await fetch(`${API_BASE}/chats/${chatId}`, {
-      method: 'DELETE'
-    });
+    const res = await apiFetch(`/chats/${chatId}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Delete failed');
     return await res.json();
   } catch (e) {
@@ -34,7 +62,7 @@ export async function deleteSavedChat(chatId) {
 
 export async function completeActionItem(promise) {
   try {
-    const res = await fetch(`${API_BASE}/analytics/actions/complete`, {
+    const res = await apiFetch('/analytics/actions/complete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ promise })
@@ -56,7 +84,7 @@ export async function getActiveChatId(chatId) {
 export async function uploadChat(file) {
   const formData = new FormData();
   formData.append('file', file);
-  const res = await fetch(`${API_BASE}/upload`, {
+  const res = await apiFetch('/upload', {
     method: 'POST',
     body: formData,
   });
@@ -87,14 +115,14 @@ export async function loadDemoChatSession() {
 
 export async function getCommunicationStats(chatId) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/analytics/communication/${targetId}`);
+  const res = await apiFetch(`/analytics/communication/${targetId}`);
   if (!res.ok) throw new Error('Failed to fetch communication stats');
   return await res.json();
 }
 
 export async function getSummary(chatId, mode = 'bullet') {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/summarize/${targetId}`, {
+  const res = await apiFetch(`/summarize/${targetId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ mode })
@@ -105,7 +133,7 @@ export async function getSummary(chatId, mode = 'bullet') {
 
 export async function askQuestion(chatId, question) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/ask/${targetId}`, {
+  const res = await apiFetch(`/ask/${targetId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question })
@@ -116,42 +144,42 @@ export async function askQuestion(chatId, question) {
 
 export async function getTopics(chatId) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/topics/${targetId}`);
+  const res = await apiFetch(`/topics/${targetId}`);
   if (!res.ok) throw new Error('Failed to fetch topics');
   return await res.json();
 }
 
 export async function getSentimentStats(chatId) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/analytics/sentiment/${targetId}`);
+  const res = await apiFetch(`/analytics/sentiment/${targetId}`);
   if (!res.ok) throw new Error('Failed to fetch sentiment stats');
   return await res.json();
 }
 
 export async function getPeopleProfiles(chatId) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/analytics/people/${targetId}`);
+  const res = await apiFetch(`/analytics/people/${targetId}`);
   if (!res.ok) throw new Error('Failed to fetch people profiles');
   return await res.json();
 }
 
 export async function getActionItems(chatId) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/analytics/actions/${targetId}`);
+  const res = await apiFetch(`/analytics/actions/${targetId}`);
   if (!res.ok) throw new Error('Failed to fetch action items');
   return await res.json();
 }
 
 export async function getTimeline(chatId) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/analytics/timeline/${targetId}`);
+  const res = await apiFetch(`/analytics/timeline/${targetId}`);
   if (!res.ok) throw new Error('Failed to fetch timeline');
   return await res.json();
 }
 
 export async function comparePeriods(chatId, p1Start, p1End, p2Start, p2End) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/analytics/compare/${targetId}`, {
+  const res = await apiFetch(`/analytics/compare/${targetId}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -167,14 +195,14 @@ export async function comparePeriods(chatId, p1Start, p1End, p2Start, p2End) {
 
 export async function getKnowledgeGraph(chatId) {
   const targetId = await getActiveChatId(chatId);
-  const res = await fetch(`${API_BASE}/graph/${targetId}`);
+  const res = await apiFetch(`/graph/${targetId}`);
   if (!res.ok) throw new Error('Failed to fetch knowledge graph');
   return await res.json();
 }
 
 export async function getMemoryAlerts() {
   try {
-    const res = await fetch(`${API_BASE}/memory/alerts`);
+    const res = await apiFetch('/memory/alerts');
     if (!res.ok) throw new Error('Failed to fetch memory alerts');
     return await res.json();
   } catch (e) {
