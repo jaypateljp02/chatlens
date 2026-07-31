@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, List
 import uuid
@@ -35,17 +36,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-@app.get("/")
-@app.get("/api")
-def root_status():
-    return {
-        "status": "ok",
-        "service": "ChatLens AI Backend API",
-        "engine": "ChatLens On-Device & Cloud AI Active",
-        "docs_url": "/docs",
-        "health_check": "/api/health"
-    }
 
 # Persistent disk storage directory
 STORAGE_DIR = os.path.join(os.path.dirname(__file__), "uploads", "sessions")
@@ -370,3 +360,19 @@ def query_memory(request: AskQuestionRequest):
 @app.get("/api/memory/alerts")
 def get_memory_alerts():
     return {"alerts": detect_proactive_alerts()}
+
+# --- UNIFIED FRONTEND STATIC FILES MOUNTING FOR ALL-IN-ONE RENDER DEPLOYMENT ---
+FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+if os.path.exists(FRONTEND_DIST):
+    assets_dir = os.path.join(FRONTEND_DIST, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{full_path:path}")
+    def serve_frontend_spa(full_path: str):
+        if full_path.startswith("api"):
+            raise HTTPException(status_code=404, detail="API route not found")
+        file_path = os.path.join(FRONTEND_DIST, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+        return FileResponse(os.path.join(FRONTEND_DIST, "index.html"))
