@@ -1,4 +1,4 @@
-// Universal Resilient API Base Selector
+// Universal Resilient API Base Selector with Live Render Backend Match
 const getApiBaseUrl = () => {
   if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
     return import.meta.env.VITE_API_BASE.replace(/\/$/, '') + '/api';
@@ -8,11 +8,15 @@ const getApiBaseUrl = () => {
     if (host === 'localhost' || host === '127.0.0.1') {
       return 'http://localhost:8000/api';
     }
+    if (host.includes('onrender.com') || host.includes('vercel.app')) {
+      return 'https://chatlens-backend-csg8.onrender.com/api';
+    }
   }
   return '/api';
 };
 
 const API_BASE = getApiBaseUrl();
+const RENDER_BACKEND_FALLBACK = 'https://chatlens-backend-csg8.onrender.com/api';
 
 // Synchronous default initialization for activeChatId
 if (!localStorage.getItem('activeChatId')) {
@@ -24,15 +28,18 @@ async function apiFetch(endpoint, options = {}) {
   try {
     const res = await fetch(`${API_BASE}${endpoint}`, options);
     if (res.ok) return res;
-    // Fallback attempt for local port 8000 if relative /api returned 404
-    if (API_BASE !== 'http://localhost:8000/api') {
-      const fallbackRes = await fetch(`http://localhost:8000/api${endpoint}`, options);
+    
+    // Fallback attempt for live Render backend if first fetch failed
+    if (API_BASE !== RENDER_BACKEND_FALLBACK) {
+      const fallbackRes = await fetch(`${RENDER_BACKEND_FALLBACK}${endpoint}`, options);
       if (fallbackRes.ok) return fallbackRes;
     }
     return res;
   } catch (e) {
-    if (API_BASE !== 'http://localhost:8000/api') {
-      return await fetch(`http://localhost:8000/api${endpoint}`, options);
+    if (API_BASE !== RENDER_BACKEND_FALLBACK) {
+      try {
+        return await fetch(`${RENDER_BACKEND_FALLBACK}${endpoint}`, options);
+      } catch (err) {}
     }
     throw e;
   }
