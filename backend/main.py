@@ -36,6 +36,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.get("/")
+@app.get("/api")
+def root_status():
+    return {
+        "status": "ok",
+        "service": "ChatLens AI Backend API",
+        "engine": "ChatLens On-Device & Cloud AI Active",
+        "docs_url": "/docs",
+        "health_check": "/api/health"
+    }
+
 # Persistent disk storage directory
 STORAGE_DIR = os.path.join(os.path.dirname(__file__), "uploads", "sessions")
 os.makedirs(STORAGE_DIR, exist_ok=True)
