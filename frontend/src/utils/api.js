@@ -1,4 +1,4 @@
-// Universal Resilient API Base Selector with Live Render Backend Match
+// Universal Resilient API Base Selector for Unified Deployment
 const getApiBaseUrl = () => {
   if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) {
     return import.meta.env.VITE_API_BASE.replace(/\/$/, '') + '/api';
@@ -8,15 +8,12 @@ const getApiBaseUrl = () => {
     if (host === 'localhost' || host === '127.0.0.1') {
       return 'http://localhost:8000/api';
     }
-    if (host.includes('onrender.com') || host.includes('vercel.app')) {
-      return 'https://chatlens-backend-csg8.onrender.com/api';
-    }
   }
+  // For unified deployment, API is hosted on the exact same domain at relative /api
   return '/api';
 };
 
 const API_BASE = getApiBaseUrl();
-const RENDER_BACKEND_FALLBACK = 'https://chatlens-backend-csg8.onrender.com/api';
 
 // Synchronous default initialization for activeChatId
 if (!localStorage.getItem('activeChatId')) {
@@ -29,17 +26,15 @@ async function apiFetch(endpoint, options = {}) {
     const res = await fetch(`${API_BASE}${endpoint}`, options);
     if (res.ok) return res;
     
-    // Fallback attempt for live Render backend if first fetch failed
-    if (API_BASE !== RENDER_BACKEND_FALLBACK) {
-      const fallbackRes = await fetch(`${RENDER_BACKEND_FALLBACK}${endpoint}`, options);
+    // Fallback attempt for local 8000 if relative /api failed on localhost
+    if (API_BASE !== 'http://localhost:8000/api' && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      const fallbackRes = await fetch(`http://localhost:8000/api${endpoint}`, options);
       if (fallbackRes.ok) return fallbackRes;
     }
     return res;
   } catch (e) {
-    if (API_BASE !== RENDER_BACKEND_FALLBACK) {
-      try {
-        return await fetch(`${RENDER_BACKEND_FALLBACK}${endpoint}`, options);
-      } catch (err) {}
+    if (API_BASE !== 'http://localhost:8000/api' && typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      return await fetch(`http://localhost:8000/api${endpoint}`, options);
     }
     throw e;
   }
