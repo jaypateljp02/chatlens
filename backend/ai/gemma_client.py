@@ -67,7 +67,7 @@ def generate_gemma_summary(chat_text: str, mode: str = "bullet") -> Dict[str, An
 def answer_gemma_question(chat_text: str, question: str) -> Dict[str, Any]:
     """
     100% Local Smart Semantic Q&A Engine.
-    Scans chat text, expands concepts, and returns high-confidence answers with exact quote references.
+    Scans chat text, handles intent/greetings cleanly, and uses exact word-boundary matching.
     """
     lines = [line.strip() for line in chat_text.split("\n") if line.strip()]
     if not lines:
@@ -77,37 +77,74 @@ def answer_gemma_question(chat_text: str, question: str) -> Dict[str, Any]:
             "confidence": 0.0
         }
 
-    q_lower = question.lower()
-    raw_words = [w.lower() for w in re.findall(r'\w+', question) if len(w) > 2]
+    q_clean = question.strip().lower()
 
-    # Concept expansion dictionary for natural language query matching
+    # 1. GREETING & INTENT DETECTION
+    GREETINGS = {"hi", "hii", "hiii", "hello", "hey", "heyy", "namaste", "good morning", "good afternoon", "good evening", "how are you", "who are you"}
+    if q_clean in GREETINGS or any(q_clean.startswith(g + " ") for g in GREETINGS if len(g) > 2):
+        return {
+            "answer": (
+                "Hello! 👋 I am **ChatLens AI**, your on-device chat intelligence assistant.\n\n"
+                "I have analyzed your chat history and am ready to answer questions about your team's project updates, doctor/treatment logs, pending tasks, or active participants.\n\n"
+                "**Try asking me:**\n"
+                "- *What tasks are pending across all chats?*\n"
+                "- *What did Archna or Ankita report regarding treatment updates?*\n"
+                "- *Who are the most active participants in this group?*"
+            ),
+            "source_messages": [],
+            "confidence": 1.0
+        }
+
+    # Extract clean search tokens (ignoring stop words)
+    STOP_WORDS = {"is", "are", "the", "a", "an", "in", "on", "at", "to", "for", "of", "and", "or", "what", "which", "who", "when", "where", "how", "why", "did", "does", "do", "tell", "me", "about"}
+    raw_words = [w for w in re.findall(r'\b[a-zA-Z0-9_\-]{2,}\b', q_clean) if w not in STOP_WORDS]
+
+    if not raw_words:
+        raw_words = [w for w in re.findall(r'\b[a-zA-Z0-9_\-]{2,}\b', q_clean)]
+
+    # 2. CONCEPT EXPANSION
     concept_expansions = {
         "pending": ["will", "send", "complete", "do", "deadline", "tomorrow", "friday", "report", "task", "work", "audit"],
         "tasks": ["will", "send", "complete", "do", "deadline", "task", "work", "report", "file", "audit"],
-        "health": ["fever", "cough", "doctor", "medicine", "health", "symptom", "taare", "patient", "hospital"],
+        "health": ["fever", "cough", "doctor", "medicine", "health", "symptom", "taare", "patient", "hospital", "x-ray", "treatment"],
+        "treatment": ["treatment", "doctor", "x-ray", "patient", "hospital", "bone", "damaged", "nikal"],
         "who": ["said", "sent", "posted", "hi", "thanks", "will", "uploaded"],
         "when": ["2026", "january", "february", "march", "april", "may", "june", "today", "yesterday", "pm", "am"]
     }
 
     expanded_words = set(raw_words)
     for kw, synonym_list in concept_expansions.items():
-        if kw in q_lower:
+        if kw in q_clean:
             expanded_words.update(synonym_list)
 
-    # Score lines by concept match frequency
+    # 3. EXACT WORD BOUNDARY MATCHING
     scored_lines = []
     for line in lines:
         line_lower = line.lower()
-        score = sum(2 if w in line_lower else 0 for w in raw_words)
-        score += sum(1 if w in line_lower else 0 for w in expanded_words)
+        
+        # Primary match: exact word boundary
+        primary_matches = sum(2 for w in raw_words if re.search(r'\b' + re.escape(w) + r'\b', line_lower))
+        
+        # Secondary match: expanded concept
+        expanded_matches = sum(1 for w in expanded_words if re.search(r'\b' + re.escape(w) + r'\b', line_lower))
+        
+        score = primary_matches + expanded_matches
         if score > 0:
             scored_lines.append((score, line))
 
     scored_lines.sort(key=lambda x: x[0], reverse=True)
-    top_quotes = [item[1] for item in scored_lines[:4]]
+    top_quotes = [item[1] for item in scored_lines if item[0] >= 2][:4]
 
+    # 4. IF NO EXACT MATCHES FOUND
     if not top_quotes:
-        top_quotes = [l for l in lines if ":" in l and not "Messages and calls" in l][:3]
+        return {
+            "answer": (
+                f"I searched your chat history for **'{question}'**, but did not find any specific messages mentioning it.\n\n"
+                f"💡 **Tip:** You can ask about pending action items, doctor updates, or team communication stats."
+            ),
+            "source_messages": [],
+            "confidence": 0.50
+        }
 
     formatted_quotes = "\n".join([f"• {q}" for q in top_quotes])
     ans_text = (
@@ -118,7 +155,7 @@ def answer_gemma_question(chat_text: str, question: str) -> Dict[str, Any]:
     return {
         "answer": ans_text,
         "source_messages": top_quotes,
-        "confidence": 0.94 if scored_lines else 0.75
+        "confidence": 0.95
     }
 
 def extract_gemma_topics(chat_text: str) -> List[Dict[str, Any]]:
@@ -130,7 +167,7 @@ def extract_gemma_topics(chat_text: str) -> List[Dict[str, Any]]:
     
     categories = {
         "project": ["project", "deadline", "task", "report", "client", "proposal", "deliver", "build", "code"],
-        "health": ["health", "fever", "cough", "doctor", "medicine", "symptom", "patient", "clinic", "audit"],
+        "health": ["health", "fever", "cough", "doctor", "medicine", "symptom", "patient", "clinic", "audit", "x-ray", "treatment"],
         "training": ["training", "workshop", "course", "learn", "session", "lecture", "student", "class"],
         "operations": ["server", "postgres", "iis", "database", "install", "config"],
         "finance": ["budget", "cost", "price", "payment", "invoice", "fee", "licensing", "money"]
@@ -140,7 +177,7 @@ def extract_gemma_topics(chat_text: str) -> List[Dict[str, Any]]:
     for line in lines:
         lower = line.lower()
         for cat, keywords in categories.items():
-            if any(k in lower for k in keywords):
+            if any(re.search(r'\b' + re.escape(k) + r'\b', lower) for k in keywords):
                 counts[cat] += 1
 
     topics = []
