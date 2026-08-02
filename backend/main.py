@@ -18,7 +18,8 @@ from analytics.timeline import extract_timeline, compare_periods
 from analytics.knowledge_graph import generate_knowledge_graph
 from analytics.report_generator import generate_executive_report
 from ai.rag_memory import ingest_chat_into_memory, query_cross_chat_memory, detect_proactive_alerts
-from ai.gemma_client import generate_gemma_summary, answer_gemma_question, extract_gemma_topics
+from ai.rag_pipeline import generate_real_summary, answer_question_with_rag, extract_topics_with_ai
+from database.sqlite_vault import save_conversation, search_messages, get_extracted_objects
 
 from models.schemas import (
     UploadResponse, CommunicationStats, ParsedMessage, ChatMetadata,
@@ -166,7 +167,9 @@ _auto_seed_sample_session()
 
 @app.get("/api/health")
 def health_check():
-    return {"status": "ok", "engine": "ChatLens On-Device AI Active"}
+    from ai.rag_pipeline import GEMINI_AVAILABLE
+    engine = "ChatLens AI — Gemini 1.5 Flash Active ✅" if GEMINI_AVAILABLE else "ChatLens AI — Fallback Mode (Add GEMINI_API_KEY)"
+    return {"status": "ok", "engine": engine, "gemini_active": GEMINI_AVAILABLE}
 
 @app.get("/api/chats")
 def list_saved_chats():
@@ -242,6 +245,24 @@ async def upload_chat(file: UploadFile = File(...)):
     
     # Auto-ingest into RAG Memory Layer
     ingest_chat_into_memory(chat_id, file.filename, messages)
+
+    # Save to SQLite Structured Vault + Stage A Extraction
+    try:
+        msg_dicts = [
+            {"timestamp": m.timestamp, "sender": m.sender, "content": m.content,
+             "message_type": m.message_type, "is_system": m.is_system}
+            for m in messages
+        ]
+        meta_dict = {
+            "participants": metadata.participants,
+            "date_range": {"start": str(metadata.date_range.get("start", "") if isinstance(metadata.date_range, dict) else ""),
+                           "end": str(metadata.date_range.get("end", "") if isinstance(metadata.date_range, dict) else "")},
+            "group_name": metadata.group_name
+        }
+        save_conversation(chat_id, file.filename, msg_dicts, meta_dict)
+        print(f"[Vault] Chat {chat_id} saved to SQLite vault with Stage A extraction complete.")
+    except Exception as e:
+        print(f"[Vault] Warning: Could not save to SQLite vault: {e}")
     
     return UploadResponse(
         chat_id=chat_id,
@@ -282,21 +303,47 @@ def _get_chat_text(chat_id: str) -> str:
 
 @app.post("/api/summarize/{chat_id}", response_model=SummaryResponse)
 def summarize_chat(chat_id: str, request: SummaryRequest):
-    chat_text = _get_chat_text(chat_id)
-    result = generate_gemma_summary(chat_text, request.mode)
-    return SummaryResponse(**result)
+    messages = _get_messages(chat_id)
+    msg_dicts = [
+        {"timestamp": m.timestamp, "sender": m.sender, "content": m.content, "is_system": m.is_system}
+        for m in messages
+    ]
+    result = generate_real_summary(msg_dicts, request.mode)
+    return SummaryResponse(
+        summary_text=result.get("summary_text", ""),
+        key_takeaways=result.get("key_takeaways", []),
+        action_items=result.get("action_items", [])
+    )
 
 @app.post("/api/ask/{chat_id}", response_model=AskQuestionResponse)
 def ask_question(chat_id: str, request: AskQuestionRequest):
-    chat_text = _get_chat_text(chat_id)
-    result = answer_gemma_question(chat_text, request.question)
-    return AskQuestionResponse(**result)
+    messages = _get_messages(chat_id)
+    msg_dicts = [
+        {"timestamp": m.timestamp, "sender": m.sender, "content": m.content, "is_system": m.is_system}
+        for m in messages
+    ]
+    result = answer_question_with_rag(msg_dicts, request.question)
+    return AskQuestionResponse(
+        answer=result.get("answer", ""),
+        source_messages=result.get("source_messages", []),
+        confidence=result.get("confidence", 0.9)
+    )
 
 @app.get("/api/topics/{chat_id}", response_model=TopicResponse)
 def get_topics(chat_id: str):
-    chat_text = _get_chat_text(chat_id)
-    topics = extract_gemma_topics(chat_text)
+    messages = _get_messages(chat_id)
+    msg_dicts = [
+        {"timestamp": m.timestamp, "sender": m.sender, "content": m.content, "is_system": m.is_system}
+        for m in messages
+    ]
+    topics = extract_topics_with_ai(msg_dicts)
     return TopicResponse(topics=topics)
+
+@app.get("/api/extracted/{chat_id}")
+def get_extracted_objects_endpoint(chat_id: str, object_type: str = None, status: str = None):
+    """Get structured extracted objects (tasks, decisions, promises, questions, expenses)."""
+    objects = get_extracted_objects(conversation_id=chat_id, object_type=object_type, status=status)
+    return {"objects": objects, "total": len(objects)}
 
 @app.get("/api/analytics/sentiment/{chat_id}", response_model=SentimentStats)
 def get_sentiment_stats(chat_id: str):
