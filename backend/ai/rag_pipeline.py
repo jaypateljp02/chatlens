@@ -52,7 +52,7 @@ def _call_gemini(prompt: str, max_tokens: int = 1024) -> str:
 
 
 # ─── LAYER 2: Local RAG Retrieval ────────────────────────────────────────────
-def retrieve_relevant_messages(query: str, all_messages: List[Dict], top_k: int = 50) -> Tuple[List[Dict], List[int]]:
+def retrieve_relevant_messages(query: str, all_messages: List[Dict], top_k: int = 500) -> Tuple[List[Dict], List[int]]:
     """
     Retrieve the most relevant messages for a query from the local message store.
     This is the RAG retrieval step — we search BEFORE calling the AI.
@@ -216,8 +216,8 @@ def answer_question_with_rag(all_messages: List[Dict], question: str) -> Dict[st
             "ai_powered": GEMINI_AVAILABLE
         }
 
-    # RAG: Retrieve relevant messages
-    relevant_msgs, source_ids = retrieve_relevant_messages(question, all_messages, top_k=50)
+    # RAG: Retrieve relevant messages (up to 500 for maximum context)
+    relevant_msgs, source_ids = retrieve_relevant_messages(question, all_messages, top_k=500)
 
     if not relevant_msgs:
         return {
@@ -230,7 +230,7 @@ def answer_question_with_rag(all_messages: List[Dict], question: str) -> Dict[st
             "ai_powered": GEMINI_AVAILABLE
         }
 
-    chat_context = _format_messages_for_ai(relevant_msgs[:40])
+    chat_context = _format_messages_for_ai(relevant_msgs[:400])
 
     if GEMINI_AVAILABLE:
         prompt = f"""You are ChatLens AI. Answer the following question based ONLY on the WhatsApp messages provided.
